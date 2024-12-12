@@ -14,4 +14,4 @@ const db = new pg.Pool({
     connectionTimeoutMillis: 2000
 });
 
-export { db };
+export default db;
