@@ -1,8 +1,7 @@
 import express from 'express';
+import { handleHelloWorld } from '../controllers/homeController';
 
 const router = express.Router();
-router.get('/', (req, res) => {
-    res.send('Hello world');
-})
+router.get('/', handleHelloWorld);
 
 export { router };
