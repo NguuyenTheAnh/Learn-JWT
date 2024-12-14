@@ -25,7 +25,6 @@ const handleDeleteUser = async (req, res) => {
 const handleGetUpdateUser = async (req, res) => {
     let userId = req.params.userId;
     let userData = await getUser(userId);
-
     res.render('user-update.ejs', { userData });
 }
 

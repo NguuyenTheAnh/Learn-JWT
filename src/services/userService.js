@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
-import db from '../config/database.js'
+import db from '../config/database.js';
+import dataUser from '../models/index.js';
 
 var salt = bcrypt.genSaltSync(10);
 
@@ -11,11 +12,12 @@ const hashUserPassword = (userPassword) => {
 const createNewUser = async (email, password, username) => {
     try {
         let hashPassword = hashUserPassword(password);
-        await db.query(
-            `INSERT INTO users (email,password,username)
-             VALUES ($1,$2,$3);`,
-            [email, hashPassword, username]
-        );
+        // user ORM
+        await dataUser.user.create({
+            email: email,
+            password: hashPassword,
+            username: username
+        });
 
     } catch (error) {
         console.log(">>> Error getting: ", error);
@@ -36,11 +38,11 @@ const getListUser = async () => {
 
 const deleteUser = async (userId) => {
     try {
-        await db.query(
-            `DELETE FROM users
-         WHERE id=$1`,
-            [userId]
-        )
+        await dataUser.user.destroy({
+            where: {
+                id: userId,
+            },
+        })
     } catch (error) {
         console.log(">>> Error getting: ", error);
     }
@@ -48,13 +50,11 @@ const deleteUser = async (userId) => {
 
 const getUser = async (userId) => {
     try {
-        const { rows } = await db.query(
-            `SELECT *
-         FROM users
-         WHERE id=$1`,
-            [userId]
-        )
-        return rows[0];
+        let user = {};
+        user = await dataUser.user.findOne({
+            where: { id: userId }
+        })
+        return user;
     } catch (error) {
         console.log(">>> Error getting: ", error);
     }
@@ -62,12 +62,14 @@ const getUser = async (userId) => {
 
 const updateUser = async (id, email, username) => {
     try {
-        await db.query(
-            `UPDATE users
-             SET email=$1, username=$2
-             WHERE id=$3`,
-            [email, username, id]
-        )
+        await dataUser.user.update(
+            { email: email, username: username },
+            {
+                where: {
+                    id: id,
+                },
+            },
+        );
     } catch (error) {
         console.log(">>> Error getting: ", error);
     }
